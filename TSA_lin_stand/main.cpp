@@ -1,36 +1,46 @@
-#include <mbed.h>
+#include "mbed.h"
+#include "sensors/sensors.h"
 
-#define WAIT_TIME_MS 500
-DigitalIn chA(PB_4);
-DigitalIn chB(PB_5);
-DigitalOut led_left(LED3);
-DigitalOut led_right(LED2);
 
-int main() {
-  int A,B;
-  float dim=24.5/360.0; //360 lines per inch (24.5 mm)
-  float pos;
-  int count=0;
+#define WAIT_TIME_MS 80
+BufferedSerial pc(USBTX, USBRX, 115200); // tx, rx
 
-  // put your setup code here, to run once:
+FileHandle *mbed::mbed_override_console(int fd)
+{
+  return &pc;
+}
 
-  while(1) {
+Nucleo_Encoder_16_bits lin_encoder(TIM3);
 
-    A=chA.read();
-    B=chB.read();
-    if (A==B){
-      count--;
-      led_right=1;
-      led_left=0;
-    }
-    else{
-      count++;
-      led_right=0;
-      led_left=1;
-    }
+Sensors sensors(&lin_encoder);
 
-    printf("A=%d, B=%d\n",A,B);
+int main(){
 
+  float data;
+
+  while(1){
+    data=sensors.GetMeasureLin();
+    printf("%4.2f\n",data);
     thread_sleep_for(WAIT_TIME_MS);
   }
+
+  return 0;
 }
+
+// DigitalOut led_left(LED3);
+// DigitalOut led_right(LED2);
+
+// Nucleo_Encoder_16_bits lin_encoder(TIM3);
+
+// int main() {
+//   int32_t count;
+//   float length;
+
+//   while(1) {
+//     count=lin_encoder.GetCounter();
+//     length=count*25.4/360.0/4;
+//     printf("%4.4f\n",length);
+
+//     thread_sleep_for(WAIT_TIME_MS);
+//   }
+// }
