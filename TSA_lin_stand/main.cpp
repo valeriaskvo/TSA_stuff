@@ -1,6 +1,4 @@
 #include "mbed.h"
-#include "sensors/sensors.h"
-
 
 #define WAIT_TIME_MS 80
 BufferedSerial pc(USBTX, USBRX, 115200); // tx, rx
@@ -10,37 +8,23 @@ FileHandle *mbed::mbed_override_console(int fd)
   return &pc;
 }
 
-Nucleo_Encoder_16_bits lin_encoder(TIM3);
-
-Sensors sensors(&lin_encoder);
+CAN can(PB_8,PB_9);
+CANMessage msg_write,msg_read;
 
 int main(){
+  msg_write.data[0]=0x90;
+  msg_write.id=1;
+  msg_write.len=8;
 
-  float data;
+  msg_read.len=8;
 
   while(1){
-    data=sensors.GetMeasureLin();
-    printf("%4.2f\n",data);
+    can.write(msg_write);
+    can.read(msg_read);
+    for (int i=0;i<8;i++){
+      printf("%d, ",msg_read.id);
+    }
+    printf("\n");
     thread_sleep_for(WAIT_TIME_MS);
   }
-
-  return 0;
 }
-
-// DigitalOut led_left(LED3);
-// DigitalOut led_right(LED2);
-
-// Nucleo_Encoder_16_bits lin_encoder(TIM3);
-
-// int main() {
-//   int32_t count;
-//   float length;
-
-//   while(1) {
-//     count=lin_encoder.GetCounter();
-//     length=count*25.4/360.0/4;
-//     printf("%4.4f\n",length);
-
-//     thread_sleep_for(WAIT_TIME_MS);
-//   }
-// }
