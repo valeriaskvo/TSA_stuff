@@ -1,15 +1,20 @@
 import serial
-import serial.tools.list_ports as port_list
+import time
 
 # port=port_list.comports()
 s=serial.Serial("/dev/ttyACM0",baudrate=115200)
+
+s.write(b"q")
+
+time.sleep(3)
+
 f = open('data_stand.csv', 'w')
 
-for i in range(10):
+s.write(b"w")
+t0= time.time()
+while(time.time()-t0<60):
     res=s.readline().decode('utf-8')
-    print(res)
     f.write(res)
 
 f.close()
-
-
+s.write(b"q")
