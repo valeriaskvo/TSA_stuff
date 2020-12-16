@@ -2,7 +2,7 @@
 #include "sensors/sensors.h"
 #include <math.h>
 
-// #define WAIT_TIME_MS 80
+#define WAIT_TIME_MS 80
 
 #define TIME_STEP 30
 
@@ -86,7 +86,7 @@ void position_control(float target_position,motor * motor_1){
   motor_1->ee_position=sensors.GetMeasureLin();
   
   if (time_sent%time_int==0){
-    printf("%4.4f; %4.4f; %4.4f; %4.4f; %4.4f; %4.4f\n",motor_1->time,target_position,motor_1->current,motor_1->speed,motor_1->position,motor_1->ee_position);
+    printf("%4.4f; %4.4f; %4.4f; %4.4f; %4.4f; %4.4f;%4.4f\n",motor_1->time,target_position,motor_1->current,motor_1->speed,motor_1->position,motor_1->ee_position,time_v);
     time_sent=0;
   }
   time_sent++;
@@ -99,15 +99,34 @@ void initial_position(){
 }
 
 void trajectory_1(){
-  int A=15;
+  int rotations=15;
   float t=15;
-  float target_position=A*360.*sin(time_v*2*3.1415926/t);
+  float A=rotations*360.;
+  float target_position=A*sin(time_v*2*3.1415926/t);
   
   position_control(target_position,&motor_1);
 }
 
 void trajectory_2(){
+  // int rotations=15;
+  // float t=40;
+  // float A=rotations*360.;
+  // float target_position=0;
 
+  // float t_v=time_v-float(int(time_v)/int(t))*t;
+
+  // if (t_v<=t/4.)
+  //   target_position=A*4.*t_v/t;
+  // else if ((t_v>t/4.)&&(t_v<2.*t/4.))
+  //   target_position=A;
+  // else if ((t_v>=2.*t/4.)&&(t_v<=3.*t/4.))
+  //   target_position=A*(-4.*t_v/t+3);
+
+  // printf("%2.2f: %2.2f - %2.2f\n",time_v,t_v,target_position);
+  // time_v=time_v+TIME_STEP/1000.;
+  printf("ALARM!\n");
+
+  // position_control(target_position,&motor_1);
 }
 
 void Update(){
@@ -144,8 +163,8 @@ int main(){
       if(buf[0]=='w') {state = STATE2; time_v=0;}
       if(buf[0]=='e') {state = STATE3; time_v=0;}
     }
+    
     // position_control(target_position,&motor_1);
     // thread_sleep_for(WAIT_TIME_MS);
   }
-  
 }
