@@ -11,9 +11,10 @@ import pandas as pd
 RUN_TIME=10
 
 TSA_stand = {'actuator_interface':'can1', 'id':0x148,                                   # actuator data
-             'current_limit':1000, 'gains': {'kp':5.0, 'kd': 5.0},'control':'motor',    # control data 
+            'current_limit':1000, 'gains': {'kp':5, 'kd': 4.0},'control':'motor',    # control data 
                                                                                         # control types: 'motor' (default), 'linear_ee', 'rotational_ee'
-             'amplitude':360,'period':10}                                                # trajectory parameters
+            'sensors_interface':'can0',                                                # sensor data
+            'amplitude':360,'period':10}                                                # trajectory parameters
 
 def harmonic_trajectory(t,A=20,A0=None,T=5):
     if A0==None:
@@ -23,8 +24,15 @@ def harmonic_trajectory(t,A=20,A0=None,T=5):
 def pd_control(device,q_d,dq_d=0):
     data={}
     actuator=device['actuator']
-    
-    q, dq = actuator.state['angle'], actuator.state['speed']
+    sensor=device['sensors']
+    sensor.recieve_data()
+
+    if device['control']=='linear_ee':
+        q, dq = sensor.lin, sensor.speed_lin
+    elif device['control']=='rotational_ee':
+        q, dq = sensor.angle, sensor.speed_angle
+    else:
+        q, dq = actuator.state['angle'], actuator.state['speed']
 
     e, de = q_d - q, dq_d - dq
     
@@ -62,6 +70,9 @@ TSA_stand['actuator'].set_degrees()
 TSA_stand['actuator'].current_limit = TSA_stand['current_limit']
 TSA_stand['actuator'].set_zero(persistant=True)
 TSA_stand['actuator'].enable()
+
+TSA_stand['sensor_bus']=CAN_Bus(interface=TSA_stand['sensors_interface'])
+TSA_stand['sensors']=Sensors(can_bus=TSA_stand['sensor_bus'])
 
 data = {'t':[], 'q_d':[], 'dq_d':[], 'i_d':[], 'q':[], 'dq':[], 'i':[]}
 feedback_labels=['q_d','dq_d','i_d','q','dq','i']

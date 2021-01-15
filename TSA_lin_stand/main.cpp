@@ -21,12 +21,12 @@ Sensors sensors(&linear_encoder_left, &linear_encoder_right);
 
 CanBus can(PB_8, PB_9, 1000000, &sensors);
 
-AnalogIn torque_sensor(PF_9);
+// AnalogIn torque_sensor(PF_9);
 
 int main()
 {
-  float data;
-  data=4.4;
+  // float data;
+  // data=4.4;
 
 
   while (1)
