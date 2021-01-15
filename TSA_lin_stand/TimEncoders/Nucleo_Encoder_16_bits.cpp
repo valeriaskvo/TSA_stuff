@@ -213,6 +213,11 @@ namespace mbed
         return (int32_t)count;
     }
 
+    void Nucleo_Encoder_16_bits::ResetCounter()
+    {
+        TIM-> CNT = 0;
+    }
+
     TIM_HandleTypeDef *Nucleo_Encoder_16_bits::GetTimer()
     {
         return &timer;

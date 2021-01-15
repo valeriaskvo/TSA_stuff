@@ -8,6 +8,7 @@
         "string": "cpp",
         "string_view": "cpp",
         "unordered_map": "cpp",
-        "*.tcc": "cpp"
+        "*.tcc": "cpp",
+        "thread": "cpp"
     }
 }

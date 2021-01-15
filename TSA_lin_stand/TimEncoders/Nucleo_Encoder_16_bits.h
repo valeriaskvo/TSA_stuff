@@ -14,6 +14,7 @@ namespace mbed{
             Nucleo_Encoder_16_bits(TIM_TypeDef * _TIM, uint32_t _maxcount, uint32_t _encmode);
             Nucleo_Encoder_16_bits(TIM_Encoder_InitTypeDef * _encoder, TIM_HandleTypeDef * _timer, TIM_TypeDef * _TIM, uint32_t _maxcount, uint32_t _encmode);
             int32_t GetCounter();
+            void ResetCounter();
             TIM_HandleTypeDef* GetTimer();
         
         private :
