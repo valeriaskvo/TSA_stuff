@@ -1,4 +1,6 @@
 #include "CanBus.h"
+#include "mbed.h"
+
 
 // class constructor
 CanBus::CanBus(PinName rd, PinName td, int hz, Sensors *sensors) : can(rd, td, hz),
@@ -24,7 +26,7 @@ void CanBus::onMsgReceived()
     {
         switch (rxMsg.data[0])
         {
-        case MSG_READ_DATA:
+        case MSG_READ_ENCODER:
             read_encoders(rxMsg);
             break;
         case MSG_RESET:
@@ -32,7 +34,9 @@ void CanBus::onMsgReceived()
             break;
         case MSG_CONFIG:
             configuration_mode(rxMsg);
-            break;    
+            break;
+        case MSG_TORQUE:
+            read_torque(rxMsg);    
         default:
             unknown_command(rxMsg);
             break;
@@ -46,6 +50,7 @@ void CanBus::unknown_command(CANMessage &msg)
     memcpy(txMsg.data, msg.data, msg.len);
     can.write(txMsg);
 }
+
 
 void CanBus::reset_counters(CANMessage &msg)
 {
@@ -66,7 +71,6 @@ void CanBus::configuration_mode(CANMessage &msg)
 }
 
 
-
 void CanBus::read_encoders(CANMessage &msg)
 {
     txMsg.id = msg.id;
@@ -82,6 +86,26 @@ void CanBus::read_encoders(CANMessage &msg)
     txMsg.data[5] = *((uint8_t *)(&rightEncoder));
     txMsg.data[6] = *((uint8_t *)(&rightEncoder) + 1);
     txMsg.data[7] = 0x00;
+
+    can.write(txMsg);
+}
+
+void CanBus::read_torque(CANMessage &msg)
+{
+    txMsg.id = msg.id;
+    txMsg.data[0] = msg.data[0];
+    
+    AnalogIn torque_sensor(PF_9);
+    float data;
+
+    data=torque_sensor.read();
+
+    uint8_t bytes[4];
+    memcpy(bytes, &data,sizeof(data));
+
+    for (int i=0;i<4;i++){
+        txMsg.data[i+2] = bytes[i];
+    }
 
     can.write(txMsg);
 }

@@ -16,9 +16,10 @@ class CanBus
 public:
     enum
     {
-        MSG_READ_DATA = 0x01,
+        MSG_READ_ENCODER = 0x01,
         MSG_RESET = 0x02,
         MSG_CONFIG = 0x03,
+        MSG_TORQUE = 0x04,
     };
 
     // class constructor
@@ -31,6 +32,7 @@ public:
     void reset_counters(CANMessage &msg); // reset counters for both encoders
     void read_encoders(CANMessage &msg); // read counters for both encoders
     void unknown_command(CANMessage &msg);
+    void read_torque(CANMessage &msg);
 
     // class destructor
     ~CanBus();
