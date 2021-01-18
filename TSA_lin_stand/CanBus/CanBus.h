@@ -19,7 +19,7 @@ public:
         MSG_READ_ENCODER = 0x01,
         MSG_RESET = 0x02,
         MSG_CONFIG = 0x03,
-        MSG_TORQUE = 0x04,
+        MSG_READ_FORCE = 0x04,
     };
 
     // class constructor
@@ -31,8 +31,8 @@ public:
     void configuration_mode(CANMessage &msg); // go to configuration mode 
     void reset_counters(CANMessage &msg); // reset counters for both encoders
     void read_encoders(CANMessage &msg); // read counters for both encoders
+    void read_force(CANMessage &msg); // read analog input from force sensor
     void unknown_command(CANMessage &msg);
-    void read_torque(CANMessage &msg);
 
     // class destructor
     ~CanBus();

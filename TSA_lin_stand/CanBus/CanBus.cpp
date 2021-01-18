@@ -29,14 +29,15 @@ void CanBus::onMsgReceived()
         case MSG_READ_ENCODER:
             read_encoders(rxMsg);
             break;
+        case MSG_READ_FORCE:
+            read_force(rxMsg);
+            break;
         case MSG_RESET:
             reset_counters(rxMsg);
             break;
         case MSG_CONFIG:
             configuration_mode(rxMsg);
-            break;
-        case MSG_TORQUE:
-            read_torque(rxMsg);    
+            break;  
         default:
             unknown_command(rxMsg);
             break;
@@ -90,25 +91,23 @@ void CanBus::read_encoders(CANMessage &msg)
     can.write(txMsg);
 }
 
-void CanBus::read_torque(CANMessage &msg)
+void CanBus::read_force(CANMessage &msg)
 {
     txMsg.id = msg.id;
     txMsg.data[0] = msg.data[0];
+
+    float force = sensors->getForce();
+    uint8_t forceMsg[4];
+    memcpy(forceMsg,&force,sizeof(force));
     
-    AnalogIn torque_sensor(PF_9);
-    float data;
-
-    data=torque_sensor.read();
-
-    uint8_t bytes[4];
-    memcpy(bytes, &data,sizeof(data));
-
-    for (int i=0;i<4;i++){
-        txMsg.data[i+2] = bytes[i];
+    for (int i=0;i<4;i++)
+    { 
+        txMsg.data[i+2] = forceMsg[i];
     }
 
     can.write(txMsg);
 }
+
 
 // class destructor
 CanBus::~CanBus()
