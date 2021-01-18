@@ -77,16 +77,17 @@ void CanBus::read_encoders(CANMessage &msg)
     txMsg.id = msg.id;
     txMsg.data[0] = msg.data[0];
 
-    uint16_t leftEncoder = sensors->getLeftCounts(); 
-    uint16_t rightEncoder = sensors->getRightCounts();
-    
-    txMsg.data[1] = 0x00;
-    txMsg.data[2] = *(uint8_t *)(&leftEncoder);
-    txMsg.data[3] = *((uint8_t *)(&leftEncoder) + 1);
-    txMsg.data[4] = 0x00;
-    txMsg.data[5] = *((uint8_t *)(&rightEncoder));
-    txMsg.data[6] = *((uint8_t *)(&rightEncoder) + 1);
-    txMsg.data[7] = 0x00;
+    int16_t leftEncoder = sensors->getLeftCounts(); 
+    int16_t rightEncoder = sensors->getRightCounts();
+
+    uint8_t sensorMsg[2];
+    memcpy(sensorMsg,&leftEncoder,sizeof(leftEncoder));
+    txMsg.data[2] = sensorMsg[0];
+    txMsg.data[3] = sensorMsg[1];
+
+    memcpy(sensorMsg,&rightEncoder,sizeof(leftEncoder));
+    txMsg.data[5] = sensorMsg[0];
+    txMsg.data[6] = sensorMsg[1];
 
     can.write(txMsg);
 }
